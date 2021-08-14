@@ -7,20 +7,26 @@ import OpenSearch from "./components/OpenSearch";
 
 class BooksApp extends React.Component {
   state = {
-    /**
-     * TODO: Instead of using this state variable to keep track of which page
-     * we're on, use the URL in the browser's address bar. This will ensure that
-     * users can use the browser's back and forward buttons to navigate between
-     * pages, as well as provide a good URL they can bookmark and share.
-     */
+    books: [],
     showSearchPage: false,
   };
 
   componentDidMount() {
-    BooksAPI.getAll().then((books) => console.log());
+    BooksAPI.getAll().then((books) =>
+      this.setState({
+        books,
+      })
+    );
   }
 
   render() {
+    const currentlyReadingBooks = this.state.books.filter(
+      (book) => book.shelf === "currentlyReading"
+    );
+    const wantToReadBooks = this.state.books.filter(
+      (book) => book.shelf === "wantToRead"
+    );
+    const readBooks = this.state.books.filter((book) => book.shelf === "read");
     return (
       <div className="app">
         {this.state.showSearchPage ? (
@@ -32,7 +38,16 @@ class BooksApp extends React.Component {
             </div>
             <div className="list-books-content">
               <div>
-                <BookShelf />
+                <BookShelf
+                  title="Currently Reading"
+                  books={currentlyReadingBooks}
+                />
+              </div>
+              <div>
+                <BookShelf title="Want To Read" books={wantToReadBooks} />
+              </div>
+              <div>
+                <BookShelf title="Read" books={readBooks} />
               </div>
             </div>
             <OpenSearch />

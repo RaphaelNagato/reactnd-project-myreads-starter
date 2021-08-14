@@ -1,9 +1,9 @@
 import React from "react";
 
-const BookShelfChanger = ({ name }) => {
+const BookShelfChanger = ({ bookShelf }) => {
   return (
     <div className="book-shelf-changer">
-      <select>
+      <select value={bookShelf} onChange={() => {}}>
         <option value="move" disabled>
           Move to...
         </option>
