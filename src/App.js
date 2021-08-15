@@ -4,11 +4,11 @@ import "./App.css";
 import BookShelf from "./components/BookShelf";
 import SearchBooks from "./components/SearchBooks";
 import OpenSearch from "./components/OpenSearch";
+import { Route } from "react-router-dom";
 
 class BooksApp extends React.Component {
   state = {
     books: [],
-    showSearchPage: false,
   };
   fetchBooks = () => {
     BooksAPI.getAll().then((books) => this.setState({ books }));
@@ -41,27 +41,30 @@ class BooksApp extends React.Component {
     ];
     return (
       <div className="app">
-        {this.state.showSearchPage ? (
-          <SearchBooks />
-        ) : (
-          <div className="list-books">
-            <div className="list-books-title">
-              <h1>MyReads</h1>
+        <Route
+          exact
+          path="/"
+          render={() => (
+            <div className="list-books">
+              <div className="list-books-title">
+                <h1>MyReads</h1>
+              </div>
+              <div className="list-books-content">
+                {shelves.map((shelf) => (
+                  <div key={shelf.id}>
+                    <BookShelf
+                      title={shelf.title}
+                      books={shelf.books}
+                      onShelfChange={this.handleChangeShelf}
+                    />
+                  </div>
+                ))}
+              </div>
+              <OpenSearch />
             </div>
-            <div className="list-books-content">
-              {shelves.map((shelf) => (
-                <div key={shelf.id}>
-                  <BookShelf
-                    title={shelf.title}
-                    books={shelf.books}
-                    onShelfChange={this.handleChangeShelf}
-                  />
-                </div>
-              ))}
-            </div>
-            <OpenSearch />
-          </div>
-        )}
+          )}
+        />
+        <Route path="/search" component={SearchBooks} />
       </div>
     );
   }
