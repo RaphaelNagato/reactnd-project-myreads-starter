@@ -2,12 +2,16 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import Book from "./Book";
 import { search } from "../BooksAPI";
+import * as Utils from "../utils/utils";
+import LoadingComponent from "./LoadingComponent";
 
 class SearchBooks extends Component {
   state = {
     searchText: "",
     books: [],
     delayTimer: 0,
+    loading: false,
+    error: null,
   };
 
   changeSearchText = (e) => {
@@ -21,25 +25,35 @@ class SearchBooks extends Component {
       clearTimeout(this.state.delayTimer);
     }
 
-    if (this.state.searchText === "") {
-      this.setState({ books: [] });
+    if (Utils.isEmpty(this.state.searchText)) {
+      this.setState({ books: [], loading: false });
       return;
     }
 
     this.setState({
+      loading: true,
+    });
+
+    this.setState({
       delayTimer: setTimeout(() => {
-        search(this.state.searchText.trim()).then((result) => {
-          if (result && result.length > 0) {
-            this.setState({ books: result });
-          } else {
-            this.setState({ books: [] });
-          }
-        });
-      }, 1000),
+        search(this.state.searchText.trim())
+          .then((result) => {
+            if (result && result.length > 0) {
+              this.setState({ books: result, loading: false });
+            } else {
+              this.setState({ books: [], loading: false });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            this.setState({ error: err.message });
+          });
+      }, 500),
     });
   };
 
   render() {
+    //This function transforms the books queried from search into one with shelf state if it exists in shelfBooks props
     const showingBooks = this.state.books.map((searchBook) => {
       const bookWithShelf = this.props.shelfBooks.filter(
         (shelfBook) => shelfBook.id === searchBook.id
@@ -73,6 +87,24 @@ class SearchBooks extends Component {
           </div>
         </div>
         <div className="search-books-results">
+          {Utils.isEmpty(this.state.searchText) && (
+            <p>No query in search bar</p>
+          )}
+
+          {this.state.loading === false &&
+            !Utils.isEmpty(this.state.searchText) &&
+            showingBooks.length === 0 && <p>Query not found</p>}
+
+          {(this.state.loading || this.state.error) && (
+            <div className="loading">
+              {this.state.loading ? (
+                <LoadingComponent type={"spinningBubbles"} color={"#00FF00"} />
+              ) : (
+                this.state.error
+              )}
+            </div>
+          )}
+
           {showingBooks.length !== 0 && (
             <ol className="books-grid">
               {showingBooks.map((book) => (

@@ -5,13 +5,18 @@ import BookShelf from "./components/BookShelf";
 import SearchBooks from "./components/SearchBooks";
 import OpenSearch from "./components/OpenSearch";
 import { Route } from "react-router-dom";
+import LoadingComponent from "./components/LoadingComponent";
 
 class BooksApp extends React.Component {
   state = {
     books: [],
+    loading: true,
+    error: null,
   };
   fetchBooks = () => {
-    BooksAPI.getAll().then((books) => this.setState({ books }));
+    BooksAPI.getAll()
+      .then((books) => this.setState({ books, loading: false }))
+      .catch((err) => this.setState({ loading: false, error: err.message }));
   };
   componentDidMount() {
     this.fetchBooks();
@@ -26,6 +31,18 @@ class BooksApp extends React.Component {
   };
 
   render() {
+    if (this.state.loading || this.state.error) {
+      return (
+        <div className="loading">
+          {this.state.loading ? (
+            <LoadingComponent type={"spinningBubbles"} color={"#00FF00"} />
+          ) : (
+            this.state.error
+          )}
+        </div>
+      );
+    }
+
     const shelves = [
       {
         id: 0,
