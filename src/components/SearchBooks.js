@@ -55,10 +55,10 @@ class SearchBooks extends Component {
   render() {
     //This function transforms the books queried from search into one with shelf state if it exists in shelfBooks props
     const showingBooks = this.state.books.map((searchBook) => {
-      const bookWithShelf = this.props.shelfBooks.filter(
+      const bookWithShelf = this.props.shelfBooks.find(
         (shelfBook) => shelfBook.id === searchBook.id
       );
-      return bookWithShelf.length > 0 ? bookWithShelf[0] : searchBook;
+      return bookWithShelf ? bookWithShelf : searchBook;
     });
 
     return (
