@@ -6,6 +6,10 @@ const Book = ({ book, onShelfChange }) => {
     onShelfChange(book, shelf);
   };
 
+  const showBookThumbnail = () => {
+    return book.imageLinks ? `url(${book.imageLinks.thumbnail})` : "none";
+  };
+
   return (
     <div className="book">
       <div className="book-top">
@@ -14,7 +18,7 @@ const Book = ({ book, onShelfChange }) => {
           style={{
             width: 128,
             height: 193,
-            backgroundImage: `url(${book.imageLinks.thumbnail})`,
+            backgroundImage: showBookThumbnail(),
           }}
         />
         <BookShelfChanger
@@ -24,7 +28,9 @@ const Book = ({ book, onShelfChange }) => {
         />
       </div>
       <div className="book-title">{book.title}</div>
-      <div className="book-authors">{book.authors.join(",")}</div>
+      <div className="book-authors">
+        {book.authors && book.authors.join(",")}
+      </div>
     </div>
   );
 };

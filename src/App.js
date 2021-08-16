@@ -17,7 +17,7 @@ class BooksApp extends React.Component {
     this.fetchBooks();
   }
 
-  handleChangeShelf = (book, shelf) => {
+  handleShelfChange = (book, shelf) => {
     BooksAPI.update(book, shelf).then(() => this.fetchBooks());
   };
 
@@ -55,7 +55,7 @@ class BooksApp extends React.Component {
                     <BookShelf
                       title={shelf.title}
                       books={shelf.books}
-                      onShelfChange={this.handleChangeShelf}
+                      onShelfChange={this.handleShelfChange}
                     />
                   </div>
                 ))}
@@ -64,7 +64,15 @@ class BooksApp extends React.Component {
             </div>
           )}
         />
-        <Route path="/search" component={SearchBooks} />
+        <Route
+          path="/search"
+          render={() => (
+            <SearchBooks
+              shelfBooks={this.state.books}
+              onShelfChange={this.handleShelfChange}
+            />
+          )}
+        />
       </div>
     );
   }

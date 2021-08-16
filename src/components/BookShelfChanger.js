@@ -5,9 +5,13 @@ const BookShelfChanger = ({ bookShelf, onShelfChange }) => {
     onShelfChange(shelf);
   };
 
+  const showShelf = () => {
+    return bookShelf ? bookShelf : "none";
+  };
+
   return (
     <div className="book-shelf-changer">
-      <select value={bookShelf} onChange={(e) => changeShelf(e.target.value)}>
+      <select value={showShelf()} onChange={(e) => changeShelf(e.target.value)}>
         <option value="move" disabled>
           Move to...
         </option>

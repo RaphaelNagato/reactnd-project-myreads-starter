@@ -1,9 +1,52 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import Book from "./Book";
+import { search } from "../BooksAPI";
 
 class SearchBooks extends Component {
-  state = {};
+  state = {
+    searchText: "",
+    books: [],
+    delayTimer: 0,
+  };
+
+  changeSearchText = (e) => {
+    this.setState({
+      searchText: e.target.value,
+    });
+  };
+
+  getBooks = () => {
+    if (this.state.delayTimer) {
+      clearTimeout(this.state.delayTimer);
+    }
+
+    if (this.state.searchText === "") {
+      this.setState({ books: [] });
+      return;
+    }
+
+    this.setState({
+      delayTimer: setTimeout(() => {
+        search(this.state.searchText.trim()).then((result) => {
+          if (result && result.length > 0) {
+            this.setState({ books: result });
+          } else {
+            this.setState({ books: [] });
+          }
+        });
+      }, 1000),
+    });
+  };
+
   render() {
+    const showingBooks = this.state.books.map((searchBook) => {
+      const bookWithShelf = this.props.shelfBooks.filter(
+        (shelfBook) => shelfBook.id === searchBook.id
+      );
+      return bookWithShelf.length > 0 ? bookWithShelf[0] : searchBook;
+    });
+
     return (
       <div className="search-books">
         <div className="search-books-bar">
@@ -20,11 +63,25 @@ class SearchBooks extends Component {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-            <input type="text" placeholder="Search by title or author" />
+            <input
+              type="text"
+              value={this.state.searchText}
+              onChange={this.changeSearchText}
+              placeholder="Search by title or author"
+              onKeyUp={this.getBooks}
+            />
           </div>
         </div>
         <div className="search-books-results">
-          <ol className="books-grid" />
+          {showingBooks.length !== 0 && (
+            <ol className="books-grid">
+              {showingBooks.map((book) => (
+                <li key={book.id}>
+                  <Book book={book} onShelfChange={this.props.onShelfChange} />
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
       </div>
     );
